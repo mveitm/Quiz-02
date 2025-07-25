@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Reducción de Términos Semejantes - Profesor Mauricio Veit</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for Inter font and general body styling */
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Pink and red gradient background */
+            background: linear-gradient(to right, #fbcfe8, #f87171); /* Pink-200 to Red-400 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        /* Ensure the main container is centered and responsive */
+        #quiz-container {
+            max-width: 650px; /* Slightly wider container */
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 1.5rem; /* Rounded corners */
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+            padding: 2.5rem; /* Ample padding */
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            border: 4px solid #ec4899; /* Accent border: Pink-600 */
+        }
+        /* Style for question text */
+        #question-order {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+        }
+        #question-text {
+            font-size: 1.4rem; /* Slightly larger font for questions */
+            font-weight: 700; /* Bold */
+            color: #1f2937; /* Darker text for readability */
+            margin-bottom: 1.5rem;
+        }
+        /* Style for alternative buttons */
+        .alternative-button {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem; /* Rounded corners for buttons */
+            background-color: #fce7f3; /* Light pink-100 background */
+            color: #be185d; /* Rose-700 text */
+            font-weight: 600;
+            transition: background-color 0.2s, transform 0.2s, border-color 0.2s;
+            cursor: pointer;
+            border: 2px solid transparent; /* Default border */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* Subtle shadow on buttons */
+        }
+        .alternative-button:hover:not(.correct-answer):not(.incorrect-answer) {
+            background-color: #fbcfe8; /* Pink-200 on hover */
+            transform: translateY(-3px); /* More pronounced lift effect */
+            border-color: #f472b6; /* Pink-400 */
+        }
+        .alternative-button.selected {
+            border-color: #db2777; /* Pink-600 border when selected */
+            background-color: #fbcfe8; /* Pink-200 background */
+        }
+        .alternative-button.correct-answer {
+            background-color: #dcfce7; /* Light green for correct */
+            border-color: #22c55e; /* Green border */
+            color: #16a34a; /* Dark green text */
+            font-weight: 700;
+        }
+        .alternative-button.incorrect-answer {
+            background-color: #fee2e2; /* Light red for incorrect */
+            border-color: #ef4444; /* Red border */
+            color: #dc2626; /* Dark red text */
+            font-weight: 700;
+        }
+        /* Style for feedback message */
+        #feedback-message {
+            margin-top: 1rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        /* Style for next question button */
+        #next-button {
+            padding: 1rem 2.5rem;
+            border-radius: 0.75rem;
+            background-color: #db2777; /* Pink-600 background */
+            color: #ffffff; /* White text */
+            font-weight: 700;
+            transition: background-color 0.2s, transform 0.2s;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+        }
+        #next-button:hover {
+            background-color: #be185d; /* Pink-700 on hover */
+            transform: translateY(-3px);
+        }
+        #next-button:disabled {
+            background-color: #9ca3af; /* Gray when disabled */
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        /* Style for final results */
+        #results-container {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #334155;
+            margin-top: 2rem;
+        }
+        #restart-button {
+            padding: 0.9rem 1.8rem;
+            border-radius: 0.6rem;
+            background-color: #ec4899; /* Pink-600 for restart */
+            color: #ffffff;
+            font-weight: 700;
+            transition: background-color 0.2s, transform 0.2s;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        #restart-button:hover {
+            background-color: #db2777; /* Pink-700 on hover */
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container" class="flex flex-col items-center">
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">Quiz de Reducción de Términos Semejantes</h1>
+        <!-- Profesor's name with bold blue letters -->
+        <p class="text-lg font-bold text-blue-700 mb-6">Profesor: Mauricio Veit</p>
+
+        <div id="quiz-content" class="w-full">
+            <p id="question-order" class="text-center"></p>
+            <p id="question-text" class="text-center"></p>
+            <div id="alternatives-container" class="flex flex-col gap-4 mb-6">
+                <!-- Alternative buttons will be inserted here by JavaScript -->
+            </div>
+            <p id="feedback-message" class="text-lg font-medium"></p>
+            <button id="next-button" class="next-button px-8 py-3 rounded-xl bg-indigo-600 text-white font-semibold shadow-lg hover:bg-indigo-700 transition-all duration-300" disabled>Siguiente Pregunta</button>
+        </div>
+
+        <div id="results-container" class="hidden">
+            <p id="final-score" class="text-2xl font-bold text-gray-800 mb-4"></p>
+            <p id="final-message" class="text-xl text-gray-700 mb-6"></p>
+            <button id="restart-button" class="px-6 py-3 rounded-lg bg-green-500 text-white font-semibold shadow-md hover:bg-green-600 transition-all duration-300">Volver a Intentar</button>
+        </div>
+    </div>
+
+    <script>
+        // Minibase de datos estática con 30 ejercicios de Reducción de Términos Semejantes (solo sumas y restas)
+        const ejerciciosDisponibles = [
+            // Dificultad: Muy Simple (1 variable, 2 términos)
+            {"pregunta": "3x + 5x", "respuesta_correcta": "8x", "alternativas": ["2x", "15x", "8x"]},
+            {"pregunta": "7y - 2y", "respuesta_correcta": "5y", "alternativas": ["9y", "5", "5y"]},
+            {"pregunta": "a + 4a", "respuesta_correcta": "5a", "alternativas": ["4a", "a²", "5a"]},
+            {"pregunta": "10m - m", "respuesta_correcta": "9m", "alternativas": ["10", "11m", "9m"]},
+            {"pregunta": "2b + 6b", "respuesta_correcta": "8b", "alternativas": ["4b", "12b", "8b"]},
+
+            // Dificultad: Simple (1 variable, 3 términos o 2 variables, 2 términos)
+            {"pregunta": "4x + 2x - x", "respuesta_correcta": "5x", "alternativas": ["7x", "6x", "5x"]},
+            {"pregunta": "8y - 3y + y", "respuesta_correcta": "6y", "alternativas": ["4y", "12y", "6y"]},
+            {"pregunta": "2a + 5b - a", "respuesta_correcta": "a + 5b", "alternativas": ["7ab", "7a - b", "a + 5b"]},
+            {"pregunta": "6m - 2n + 3n", "respuesta_correcta": "6m + n", "alternativas": ["4mn", "6m - n", "6m + n"]},
+            {"pregunta": "x² + 2x²", "respuesta_correcta": "3x²", "alternativas": ["3x", "x⁴", "3x²"]},
+            {"pregunta": "5ab - 2ab", "respuesta_correcta": "3ab", "alternativas": ["7ab", "3a²b²", "3ab"]},
+            {"pregunta": "9p - 4q + 2p", "respuesta_correcta": "11p - 4q", "alternativas": ["7pq", "13p - 4q", "11p - 4q"]},
+            {"pregunta": "3c + 7d - c", "respuesta_correcta": "2c + 7d", "alternativas": ["10cd", "4c + 7d", "2c + 7d"]},
+            {"pregunta": "4xy + 3xy", "respuesta_correcta": "7xy", "alternativas": ["12xy", "7x²y²", "7xy"]},
+            {"pregunta": "z³ + 5z³ - 2z³", "respuesta_correcta": "4z³", "alternativas": ["8z³", "3z³", "4z³"]},
+
+            // Dificultad: Media (Múltiples variables, términos negativos, potencias)
+            {"pregunta": "2x + 3y - x + y", "respuesta_correcta": "x + 4y", "alternativas": ["5xy", "3x + 4y", "x + 4y"]},
+            {"pregunta": "5a - 2b + 3a + 4b", "respuesta_correcta": "8a + 2b", "alternativas": ["14ab", "8a - 2b", "8a + 2b"]},
+            {"pregunta": "x² + 3x - 2x² + 5x", "respuesta_correcta": "-x² + 8x", "alternativas": ["x² + 8x", "-x² + 2x", "-x² + 8x"]},
+            {"pregunta": "7m³ - 2m² + m³", "respuesta_correcta": "8m³ - 2m²", "alternativas": ["6m⁵", "5m³ - 2m²", "8m³ - 2m²"]},
+            {"pregunta": "4ab - 7cd + ab + 2cd", "respuesta_correcta": "5ab - 5cd", "alternativas": ["-3abcd", "5ab + 5cd", "5ab - 5cd"]},
+            {"pregunta": "12p + 5q - 3p - 8q", "respuesta_correcta": "9p - 3q", "alternativas": ["17pq", "9p + 3q", "9p - 3q"]},
+            {"pregunta": "-5x + 9x - 2x", "respuesta_correcta": "2x", "alternativas": ["16x", "-2x", "2x"]},
+            {"pregunta": "6y² - y² + 3y²", "respuesta_correcta": "8y²", "alternativas": ["10y²", "8y⁴", "8y²"]},
+            {"pregunta": "3mn + 8mn - mn", "respuesta_correcta": "10mn", "alternativas": ["12mn", "10m²n²", "10mn"]},
+            {"pregunta": "a³ + 4a² - 2a³ + a²", "respuesta_correcta": "-a³ + 5a²", "alternativas": ["3a⁵", "a³ + 5a²", "-a³ + 5a²"]},
+            {"pregunta": "15r - 10s + 2r + 3s", "respuesta_correcta": "17r - 7s", "alternativas": ["5rs", "13r - 7s", "17r - 7s"]},
+            {"pregunta": "8uv + 2w - 3uv - 5w", "respuesta_correcta": "5uv - 3w", "alternativas": ["11uv + 7w", "5uv + 3w", "5uv - 3w"]},
+            {"pregunta": "4x³ - 7x² + 2x³ + x²", "respuesta_correcta": "6x³ - 6x²", "alternativas": ["2x³ - 6x²", "6x⁶", "6x³ - 6x²"]},
+            {"pregunta": "9cd + 2ef - 5cd - ef", "respuesta_correcta": "4cd + ef", "alternativas": ["14cd + 3ef", "4cd - ef", "4cd + ef"]},
+            {"pregunta": "ab² + 3ab - 2ab² + ab", "respuesta_correcta": "-ab² + 4ab", "alternativas": ["ab² + 4ab", "2ab² + 4ab", "-ab² + 4ab"]},
+        ];
+
+        let ejerciciosQuiz = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let questionAnswered = false; // Flag to prevent multiple answers per question
+
+        // Get DOM elements
+        const questionOrder = document.getElementById('question-order');
+        const questionText = document.getElementById('question-text');
+        const alternativesContainer = document.getElementById('alternatives-container');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const nextButton = document.getElementById('next-button');
+        const quizContent = document.getElementById('quiz-content');
+        const resultsContainer = document.getElementById('results-container');
+        const finalScoreText = document.getElementById('final-score');
+        const finalMessageText = document.getElementById('final-message');
+        const restartButton = document.getElementById('restart-button');
+
+        /**
+         * Initializes the quiz by selecting 10 random questions and resetting state.
+         */
+        function startQuiz() {
+            // Select 10 random questions from the available pool
+            ejerciciosQuiz = getRandomQuestions(ejerciciosDisponibles, 10);
+            currentQuestionIndex = 0;
+            score = 0;
+            questionAnswered = false;
+
+            // Show quiz content and hide results
+            quizContent.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+            nextButton.disabled = true; // Disable next button initially
+
+            displayQuestion();
+        }
+
+        /**
+         * Selects a specified number of random questions from a given array.
+         * @param {Array} arr - The array of available questions.
+         * @param {number} num - The number of questions to select.
+         * @returns {Array} An array of randomly selected questions.
+         */
+        function getRandomQuestions(arr, num) {
+            const shuffled = [...arr].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, num);
+        }
+
+        /**
+         * Displays the current question and its alternatives.
+         */
+        function displayQuestion() {
+            feedbackMessage.textContent = ''; // Clear previous feedback
+            alternativesContainer.innerHTML = ''; // Clear previous alternatives
+            nextButton.disabled = true; // Disable next button until an answer is selected
+            questionAnswered = false; // Reset flag for new question
+
+            if (currentQuestionIndex < ejerciciosQuiz.length) {
+                const currentEjercicio = ejerciciosQuiz[currentQuestionIndex];
+                questionOrder.textContent = `Pregunta ${currentQuestionIndex + 1}/${ejerciciosQuiz.length}:`; // Separate question order
+                questionText.textContent = `Simplifica: ${currentEjercicio.pregunta}`; // Question text (no quotes around the expression)
+
+                // Shuffle alternatives for the current question
+                const shuffledAlternatives = [...currentEjercicio.alternativas].sort(() => 0.5 - Math.random());
+
+                shuffledAlternatives.forEach(alt => {
+                    const button = document.createElement('button');
+                    button.textContent = alt;
+                    button.classList.add('alternative-button', 'px-6', 'py-3', 'rounded-xl', 'bg-gray-200', 'text-gray-700', 'font-medium', 'shadow-sm', 'hover:bg-gray-300', 'transition-all', 'duration-200');
+                    button.addEventListener('click', () => handleAnswer(button, alt, currentEjercicio.respuesta_correcta));
+                    alternativesContainer.appendChild(button);
+                });
+            } else {
+                showResults();
+            }
+        }
+
+        /**
+         * Handles the user's answer selection.
+         * @param {HTMLButtonElement} selectedButton - The button element that was clicked.
+         * @param {string} selectedAnswer - The text of the selected answer.
+         * @param {string} correctAnswer - The correct answer for the current question.
+         */
+        function handleAnswer(selectedButton, selectedAnswer, correctAnswer) {
+            if (questionAnswered) return; // Prevent answering multiple times
+
+            questionAnswered = true;
+            nextButton.disabled = false; // Enable next button
+
+            // Disable all alternative buttons after selection
+            Array.from(alternativesContainer.children).forEach(button => {
+                button.disabled = true;
+                button.classList.remove('hover:bg-gray-300', 'hover:transform', 'hover:-translate-y-2'); // Remove hover effects
+            });
+
+            selectedButton.classList.add('selected'); // Highlight selected answer
+
+            if (selectedAnswer === correctAnswer) {
+                score++;
+                selectedButton.classList.remove('bg-gray-200', 'text-gray-700', 'selected');
+                selectedButton.classList.add('correct-answer');
+                feedbackMessage.textContent = '¡Correcto! 🎉 ¡Bien hecho! ✅';
+                feedbackMessage.classList.remove('text-red-600');
+                feedbackMessage.classList.add('text-green-600');
+            } else {
+                selectedButton.classList.remove('bg-gray-200', 'text-gray-700', 'selected');
+                selectedButton.classList.add('incorrect-answer');
+                feedbackMessage.textContent = `Incorrecto. La respuesta correcta era: ${correctAnswer} 😕 ¡Sigue intentando! 💡`;
+                feedbackMessage.classList.remove('text-green-600');
+                feedbackMessage.classList.add('text-red-600');
+
+                // Highlight the correct answer among the alternatives
+                Array.from(alternativesContainer.children).forEach(button => {
+                    if (button.textContent === correctAnswer) {
+                        button.classList.add('correct-answer');
+                        button.classList.remove('bg-gray-200', 'text-gray-700');
+                    }
+                });
+            }
+        }
+
+        /**
+         * Moves to the next question or shows results if all questions are answered.
+         */
+        function nextQuestion() {
+            currentQuestionIndex++;
+            displayQuestion();
+        }
+
+        /**
+         * Displays the final score and a congratulatory/encouraging message.
+         */
+        function showResults() {
+            quizContent.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+
+            finalScoreText.textContent = `Tu puntaje final es: ${score} de ${ejerciciosQuiz.length}`;
+
+            let message = '';
+            if (score === ejerciciosQuiz.length) {
+                message = "¡Felicidades! ¡Has logrado un puntaje perfecto! Eres un verdadero maestro en la reducción de términos semejantes. ¡Impresionante! 🌟🚀";
+            } else if (score >= ejerciciosQuiz.length * 0.7) {
+                message = "¡Excelente trabajo! Has logrado un muy buen puntaje. ¡Estás dominando la reducción de términos semejantes! ¡Sigue así! 💪🧠";
+            } else {
+                message = "¡Buen intento! Cada error es una oportunidad para aprender y mejorar. No te desanimes, sigue practicando y verás cómo alcanzas tus metas. ¡Tienes mucho potencial! ✨📚";
+            }
+            finalMessageText.textContent = message;
+        }
+
+        // Event Listeners
+        nextButton.addEventListener('click', nextQuestion);
+        restartButton.addEventListener('click', startQuiz);
+
+        // Start the quiz when the page loads
+        document.addEventListener('DOMContentLoaded', startQuiz);
+    </script>
+</body>
+</html>
