@@ -10,8 +10,13 @@
         /* Custom styles for Inter font and general body styling */
         body {
             font-family: 'Inter', sans-serif;
-            /* Pink and red gradient background */
-            background: linear-gradient(to right, #fbcfe8, #f87171); /* Pink-200 to Red-400 */
+            /* Pink and red gradient background with subtle block texture */
+            background-image: linear-gradient(to right, #fbcfe8, #f87171), /* Main gradient */
+                              repeating-linear-gradient(0deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 2px, transparent 2px, transparent 20px), /* Horizontal grid lines */
+                              repeating-linear-gradient(90deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 2px, transparent 2px, transparent 20px); /* Vertical grid lines */
+            background-size: cover, 20px 20px, 20px 20px; /* Gradient covers, grid lines repeat at 20px intervals */
+            background-repeat: no-repeat, repeat, repeat; /* Gradient doesn't repeat, grid lines do */
+            background-blend-mode: overlay, normal, normal; /* Blend mode for subtle texture over gradient */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -34,40 +39,53 @@
             gap: 1.5rem;
             border: 4px solid #ec4899; /* Accent border: Pink-600 */
         }
-        /* Style for question text */
+        /* Style for question order (e.g., Pregunta 1/10) */
         #question-order {
             font-size: 1.1rem;
             font-weight: 500;
             color: #4b5563;
             margin-bottom: 0.5rem;
         }
-        #question-text {
-            font-size: 1.4rem; /* Slightly larger font for questions */
-            font-weight: 700; /* Bold */
+        /* Style for question intro (e.g., Simplifica:) */
+        #question-intro {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.5rem;
+        }
+        /* Style for the algebraic expression itself (now on its own line) */
+        #algebraic-expression {
+            font-size: 1.8rem; /* Larger font for the expression */
+            font-weight: 800; /* Extra bold for emphasis */
             color: #1f2937; /* Darker text for readability */
             margin-bottom: 1.5rem;
+            display: block; /* Ensure it takes its own line */
+            word-wrap: break-word; /* Prevents long expressions from overflowing */
+            white-space: normal; /* Allows text to wrap */
         }
         /* Style for alternative buttons */
         .alternative-button {
             width: 100%;
             padding: 1rem 1.5rem;
             border-radius: 0.75rem; /* Rounded corners for buttons */
-            background-color: #fce7f3; /* Light pink-100 background */
-            color: #be185d; /* Rose-700 text */
+            background-color: #f9a8d4; /* Pink-300, a vibrant fuchsia */
+            color: #000000; /* Black text for options */
             font-weight: 600;
+            font-size: 1.125rem; /* Slightly larger font (text-lg equivalent) */
             transition: background-color 0.2s, transform 0.2s, border-color 0.2s;
             cursor: pointer;
             border: 2px solid transparent; /* Default border */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* Subtle shadow on buttons */
         }
         .alternative-button:hover:not(.correct-answer):not(.incorrect-answer) {
-            background-color: #fbcfe8; /* Pink-200 on hover */
+            background-color: #f472b6; /* Pink-400, more vibrant fuchsia on hover */
             transform: translateY(-3px); /* More pronounced lift effect */
-            border-color: #f472b6; /* Pink-400 */
+            border-color: #ec4899; /* Pink-600 */
         }
         .alternative-button.selected {
             border-color: #db2777; /* Pink-600 border when selected */
-            background-color: #fbcfe8; /* Pink-200 background */
+            background-color: #f472b6; /* Pink-400 background */
+            color: #000000; /* Ensure text remains black when selected */
         }
         .alternative-button.correct-answer {
             background-color: #dcfce7; /* Light green for correct */
@@ -91,7 +109,7 @@
         #next-button {
             padding: 1rem 2.5rem;
             border-radius: 0.75rem;
-            background-color: #db2777; /* Pink-600 background */
+            background-color: #ec4899; /* Pink-600 background */
             color: #ffffff; /* White text */
             font-weight: 700;
             transition: background-color 0.2s, transform 0.2s;
@@ -100,7 +118,7 @@
             box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); /* Stronger shadow */
         }
         #next-button:hover {
-            background-color: #be185d; /* Pink-700 on hover */
+            background-color: #db2777; /* Pink-700 on hover */
             transform: translateY(-3px);
         }
         #next-button:disabled {
@@ -140,7 +158,8 @@
 
         <div id="quiz-content" class="w-full">
             <p id="question-order" class="text-center"></p>
-            <p id="question-text" class="text-center"></p>
+            <p id="question-intro" class="text-center">Simplifica:</p>
+            <p id="algebraic-expression" class="text-center"></p>
             <div id="alternatives-container" class="flex flex-col gap-4 mb-6">
                 <!-- Alternative buttons will be inserted here by JavaScript -->
             </div>
@@ -202,7 +221,8 @@
 
         // Get DOM elements
         const questionOrder = document.getElementById('question-order');
-        const questionText = document.getElementById('question-text');
+        const questionIntro = document.getElementById('question-intro'); // New element for "Simplifica:"
+        const algebraicExpression = document.getElementById('algebraic-expression'); // New element for the expression
         const alternativesContainer = document.getElementById('alternatives-container');
         const feedbackMessage = document.getElementById('feedback-message');
         const nextButton = document.getElementById('next-button');
@@ -252,8 +272,9 @@
 
             if (currentQuestionIndex < ejerciciosQuiz.length) {
                 const currentEjercicio = ejerciciosQuiz[currentQuestionIndex];
-                questionOrder.textContent = `Pregunta ${currentQuestionIndex + 1}/${ejerciciosQuiz.length}:`; // Separate question order
-                questionText.textContent = `Simplifica: ${currentEjercicio.pregunta}`; // Question text (no quotes around the expression)
+                questionOrder.textContent = `Pregunta ${currentQuestionIndex + 1}/${ejerciciosQuiz.length}:`;
+                questionIntro.textContent = `Simplifica:`; // "Simplifica:" is now in its own element
+                algebraicExpression.textContent = currentEjercicio.pregunta; // The expression is now in its own element
 
                 // Shuffle alternatives for the current question
                 const shuffledAlternatives = [...currentEjercicio.alternativas].sort(() => 0.5 - Math.random());
@@ -261,7 +282,9 @@
                 shuffledAlternatives.forEach(alt => {
                     const button = document.createElement('button');
                     button.textContent = alt;
-                    button.classList.add('alternative-button', 'px-6', 'py-3', 'rounded-xl', 'bg-gray-200', 'text-gray-700', 'font-medium', 'shadow-sm', 'hover:bg-gray-300', 'transition-all', 'duration-200');
+                    // Apply the new fuchsia-like colors to the alternative buttons
+                    // Removed bg-gray-200 and text-gray-700 from here, as styles are now in CSS
+                    button.classList.add('alternative-button', 'px-6', 'py-3', 'rounded-xl', 'font-medium', 'shadow-sm', 'transition-all', 'duration-200');
                     button.addEventListener('click', () => handleAnswer(button, alt, currentEjercicio.respuesta_correcta));
                     alternativesContainer.appendChild(button);
                 });
@@ -285,20 +308,21 @@
             // Disable all alternative buttons after selection
             Array.from(alternativesContainer.children).forEach(button => {
                 button.disabled = true;
-                button.classList.remove('hover:bg-gray-300', 'hover:transform', 'hover:-translate-y-2'); // Remove hover effects
+                // Removed hover effects from disabled buttons
+                button.classList.remove('hover:bg-gray-300', 'hover:transform', 'hover:-translate-y-2', 'hover:bg-pink-400', 'hover:border-pink-600');
             });
 
             selectedButton.classList.add('selected'); // Highlight selected answer
 
             if (selectedAnswer === correctAnswer) {
                 score++;
-                selectedButton.classList.remove('bg-gray-200', 'text-gray-700', 'selected');
+                selectedButton.classList.remove('selected'); // Remove selected class
                 selectedButton.classList.add('correct-answer');
                 feedbackMessage.textContent = '¡Correcto! 🎉 ¡Bien hecho! ✅';
                 feedbackMessage.classList.remove('text-red-600');
                 feedbackMessage.classList.add('text-green-600');
             } else {
-                selectedButton.classList.remove('bg-gray-200', 'text-gray-700', 'selected');
+                selectedButton.classList.remove('selected'); // Remove selected class
                 selectedButton.classList.add('incorrect-answer');
                 feedbackMessage.textContent = `Incorrecto. La respuesta correcta era: ${correctAnswer} 😕 ¡Sigue intentando! 💡`;
                 feedbackMessage.classList.remove('text-green-600');
@@ -308,7 +332,6 @@
                 Array.from(alternativesContainer.children).forEach(button => {
                     if (button.textContent === correctAnswer) {
                         button.classList.add('correct-answer');
-                        button.classList.remove('bg-gray-200', 'text-gray-700');
                     }
                 });
             }
