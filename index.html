@@ -46,7 +46,7 @@
             color: #4b5563;
             margin-bottom: 0.5rem;
         }
-        /* Style for question intro (e.g., Simplifica:) */
+        /* Style for question intro (e.g., Reduce:) */
         #question-intro {
             font-size: 1.2rem;
             font-weight: 600;
@@ -158,7 +158,7 @@
 
         <div id="quiz-content" class="w-full">
             <p id="question-order" class="text-center"></p>
-            <p id="question-intro" class="text-center">Simplifica:</p>
+            <p id="question-intro" class="text-center">Reduce:</p> <!-- Changed from Simplifica: to Reduce: -->
             <p id="algebraic-expression" class="text-center"></p>
             <div id="alternatives-container" class="flex flex-col gap-4 mb-6">
                 <!-- Alternative buttons will be inserted here by JavaScript -->
@@ -221,7 +221,7 @@
 
         // Get DOM elements
         const questionOrder = document.getElementById('question-order');
-        const questionIntro = document.getElementById('question-intro'); // New element for "Simplifica:"
+        const questionIntro = document.getElementById('question-intro'); // New element for "Reduce:"
         const algebraicExpression = document.getElementById('algebraic-expression'); // New element for the expression
         const alternativesContainer = document.getElementById('alternatives-container');
         const feedbackMessage = document.getElementById('feedback-message');
@@ -273,7 +273,7 @@
             if (currentQuestionIndex < ejerciciosQuiz.length) {
                 const currentEjercicio = ejerciciosQuiz[currentQuestionIndex];
                 questionOrder.textContent = `Pregunta ${currentQuestionIndex + 1}/${ejerciciosQuiz.length}:`;
-                questionIntro.textContent = `Simplifica:`; // "Simplifica:" is now in its own element
+                questionIntro.textContent = `Reduce:`; // Updated from "Simplifica:" to "Reduce:"
                 algebraicExpression.textContent = currentEjercicio.pregunta; // The expression is now in its own element
 
                 // Shuffle alternatives for the current question
@@ -283,7 +283,6 @@
                     const button = document.createElement('button');
                     button.textContent = alt;
                     // Apply the new fuchsia-like colors to the alternative buttons
-                    // Removed bg-gray-200 and text-gray-700 from here, as styles are now in CSS
                     button.classList.add('alternative-button', 'px-6', 'py-3', 'rounded-xl', 'font-medium', 'shadow-sm', 'transition-all', 'duration-200');
                     button.addEventListener('click', () => handleAnswer(button, alt, currentEjercicio.respuesta_correcta));
                     alternativesContainer.appendChild(button);
