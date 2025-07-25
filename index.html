@@ -10,13 +10,14 @@
         /* Custom styles for Inter font and general body styling */
         body {
             font-family: 'Inter', sans-serif;
-            /* Pink and red gradient background with subtle block texture */
+            /* Pink and red gradient background with Roblox-like texture */
             background-image: linear-gradient(to right, #fbcfe8, #f87171), /* Main gradient */
-                              repeating-linear-gradient(0deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 2px, transparent 2px, transparent 20px), /* Horizontal grid lines */
-                              repeating-linear-gradient(90deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 2px, transparent 2px, transparent 20px); /* Vertical grid lines */
-            background-size: cover, 20px 20px, 20px 20px; /* Gradient covers, grid lines repeat at 20px intervals */
-            background-repeat: no-repeat, repeat, repeat; /* Gradient doesn't repeat, grid lines do */
-            background-blend-mode: overlay, normal, normal; /* Blend mode for subtle texture over gradient */
+                              url('roblox-characters.png'); /* Your Roblox-like image */
+            background-size: cover, 100px 100px; /* Gradient covers, image repeats at 100x100px */
+            background-repeat: no-repeat, repeat; /* Gradient no-repeat, image repeats */
+            background-position: center center; /* Center the background */
+            background-attachment: fixed; /* Fix background during scroll */
+            background-blend-mode: overlay; /* Blend mode for subtle texture over gradient */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -158,7 +159,7 @@
 
         <div id="quiz-content" class="w-full">
             <p id="question-order" class="text-center"></p>
-            <p id="question-intro" class="text-center">Reduce:</p> <!-- Changed from Simplifica: to Reduce: -->
+            <p id="question-intro" class="text-center">Reduce:</p>
             <p id="algebraic-expression" class="text-center"></p>
             <div id="alternatives-container" class="flex flex-col gap-4 mb-6">
                 <!-- Alternative buttons will be inserted here by JavaScript -->
@@ -273,8 +274,8 @@
             if (currentQuestionIndex < ejerciciosQuiz.length) {
                 const currentEjercicio = ejerciciosQuiz[currentQuestionIndex];
                 questionOrder.textContent = `Pregunta ${currentQuestionIndex + 1}/${ejerciciosQuiz.length}:`;
-                questionIntro.textContent = `Reduce:`; // Updated from "Simplifica:" to "Reduce:"
-                algebraicExpression.textContent = currentEjercicio.pregunta; // The expression is now in its own element
+                questionIntro.textContent = `Reduce:`;
+                algebraicExpression.textContent = currentEjercicio.pregunta;
 
                 // Shuffle alternatives for the current question
                 const shuffledAlternatives = [...currentEjercicio.alternativas].sort(() => 0.5 - Math.random());
@@ -282,7 +283,6 @@
                 shuffledAlternatives.forEach(alt => {
                     const button = document.createElement('button');
                     button.textContent = alt;
-                    // Apply the new fuchsia-like colors to the alternative buttons
                     button.classList.add('alternative-button', 'px-6', 'py-3', 'rounded-xl', 'font-medium', 'shadow-sm', 'transition-all', 'duration-200');
                     button.addEventListener('click', () => handleAnswer(button, alt, currentEjercicio.respuesta_correcta));
                     alternativesContainer.appendChild(button);
@@ -307,7 +307,6 @@
             // Disable all alternative buttons after selection
             Array.from(alternativesContainer.children).forEach(button => {
                 button.disabled = true;
-                // Removed hover effects from disabled buttons
                 button.classList.remove('hover:bg-gray-300', 'hover:transform', 'hover:-translate-y-2', 'hover:bg-pink-400', 'hover:border-pink-600');
             });
 
@@ -315,13 +314,13 @@
 
             if (selectedAnswer === correctAnswer) {
                 score++;
-                selectedButton.classList.remove('selected'); // Remove selected class
+                selectedButton.classList.remove('selected');
                 selectedButton.classList.add('correct-answer');
                 feedbackMessage.textContent = '¡Correcto! 🎉 ¡Bien hecho! ✅';
                 feedbackMessage.classList.remove('text-red-600');
                 feedbackMessage.classList.add('text-green-600');
             } else {
-                selectedButton.classList.remove('selected'); // Remove selected class
+                selectedButton.classList.remove('selected');
                 selectedButton.classList.add('incorrect-answer');
                 feedbackMessage.textContent = `Incorrecto. La respuesta correcta era: ${correctAnswer} 😕 ¡Sigue intentando! 💡`;
                 feedbackMessage.classList.remove('text-green-600');
