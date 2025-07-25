@@ -13,7 +13,13 @@
             /* Pink and red gradient background with Roblox-like texture */
             background-image: linear-gradient(to right, #fbcfe8, #f87171), /* Main gradient */
                               url('roblox-characters.png'); /* Your Roblox-like image */
-            background-size: cover, 100px 100px; /* Gradient covers, image repeats at 100x100px */
+            /*
+             * background-size:
+             * - 'cover' for the first background (gradient) makes it cover the entire element.
+             * - '75px 75px' for the second background (image) makes it repeat at this size.
+             * Adjust '75px 75px' if your image is very large or small, or if you want a different tile size.
+             */
+            background-size: cover, 75px 75px; 
             background-repeat: no-repeat, repeat; /* Gradient no-repeat, image repeats */
             background-position: center center; /* Center the background */
             background-attachment: fixed; /* Fix background during scroll */
